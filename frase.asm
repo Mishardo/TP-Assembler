@@ -16,21 +16,24 @@
     push bp
     mov bp, sp
 
+    ;-------- Abrir el archivo ----------
     mov ah, 3Dh
     mov al, 0
     mov dx, offset arch1
     int 21h
     jc errorAbrirArchivo
 
+    ;------ Leer el archivo -------------
     mov bx, ax        ; handle
     mov ah, 3Fh
     mov cx, 4095
     int 21h           ; lee hasta 255 bytes
 
+    ;------ Cerrar el archivo -------
     mov ah, 3Eh
     int 21h
 
-    ;Seleccionar aleatorio entre 0 y 50
+    ;-------- Seleccionar aleatorio entre 0 y 50 ------
     mov ah, 00h
     int 1Ah
     mov ax, dx
@@ -38,21 +41,20 @@
     xor dx, dx
     div bx
     mov fraseSeleccionada, dl
-
-    
+    ;---------------------------------------------------
 
     call seleccionarFrase
 
     pop bp
-
     ret
+
 
     errorAbrirArchivo:
     mov bx, offset cartel
     ret
-
     frase endp
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCION EXTERNA ;;;;;;;;;;;;;;;;;;;;;;;;
     ; luego quiero agregarle un nro aleatorio y que ponga el offset al inicio de luego de un salto de linea y el signo pesos al final de esa linea
     seleccionarFrase proc
 
@@ -91,7 +93,6 @@
         ret
 
     seleccionarFrase endp
-
-
 end
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
