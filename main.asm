@@ -19,18 +19,18 @@ main proc
     mov ax,@data
     mov ds,ax
 
+;---------------------- IMPRESION DE LA FRASE ---------------------------
     ; poner modo texto o limpiar pantalla si querés
     mov ah, 0
     mov al, 03h
     int 10h
-
-
+    
     call imprimirFrase ; imprime la frase inicial
-
     lea si, fraseInicial
+;-------------------------------------------------------------------------
 
+;---------------------- CONTADOR DE ERRORES Y DE ACIERTOS------------------------------
 bucleJuego:
-
     call contador       ; actualiza contador si corresponde (no bloqueante)
     
     llamoErrores:
@@ -39,13 +39,13 @@ bucleJuego:
     mov [fila],dh       ;guardo la columna y la fila, porque errores la modifica. asi la restauro luego
     mov [columna], dl
     call errores
+
     restauroPuntero:
     mov dh, [fila]
     mov dl, [columna]
     mov ah, 02h
     mov bh, 0
     int 10h
-
 
     ; Chequear teclado (sin bloquear): INT16 AH=01
     mov ah, 01h
@@ -67,22 +67,22 @@ bucleJuego:
 
     acierto:
     inc si
-
-     ; calcular posición del * abajo de la frase
+    ; calcular posición del * abajo de la frase
     mov dh, 12           ; fila debajo de la frase
     mov dl, 10
     add dl, posAcierto   ; desplazamiento horizontal porque sino es un quilombo tengo un contador para saber en q letra voy
     mov ah, 2
     int 10h              
  
-
     mov al, "*"
     ; imprimir el caracter en AL
     mov ah, 0Eh
     int 10h
 
     inc posAcierto
-    
+;;-----------------------------------------------------------
+
+;---------------------- FIN DEL JUEGO ----------------------
     cmp byte ptr[si], "$"
     je finPrograma
 
@@ -92,7 +92,9 @@ finPrograma:
     mov ax,4C00h
     int 21h
 main endp
+;------------------------------------------------------------------
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCIONES INTERNAS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imprimirFrase proc
 
     push bp
@@ -100,7 +102,6 @@ imprimirFrase proc
     push bx
     push ax
     push dx
-
 
     call frase
     mov si, bx
@@ -111,9 +112,7 @@ imprimirFrase proc
         mov ah, 2
         int 10h 
 
-    
         lea bx, fraseInicial
-
 bucleImprimirFrase:             ;copia la frase tmb en la variable local para comparar luego en el juego
         cmp byte ptr [si], 24h
         je termineDeImprimir
@@ -125,7 +124,7 @@ bucleImprimirFrase:             ;copia la frase tmb en la variable local para co
         inc bx
         jmp bucleImprimirFrase
 
-    termineDeImprimir:
+termineDeImprimir:
     pop dx
     pop ax
     pop bx
@@ -133,7 +132,5 @@ bucleImprimirFrase:             ;copia la frase tmb en la variable local para co
 
     ret 
 imprimirFrase endp
-
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 end
