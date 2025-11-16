@@ -11,7 +11,9 @@
 
     PUBLIC frase 
 
-    frase proc 
+    frase proc
+    ; RECIBE POR PARAMETRO: NADA
+    ; Devuelve en: ??
     
     push bp
     mov bp, sp
@@ -51,12 +53,16 @@
 
     errorAbrirArchivo:
     mov bx, offset cartel
+    pop bp
     ret
+    
     frase endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCION EXTERNA ;;;;;;;;;;;;;;;;;;;;;;;;
     ; luego quiero agregarle un nro aleatorio y que ponga el offset al inicio de luego de un salto de linea y el signo pesos al final de esa linea
     seleccionarFrase proc
+    ;RECIBE POR PARAMETRO: NADA
+    ;Devuelve en: ??
 
     mov si, offset buf1
     mov cl, 1                ; contador de líneas actuales
@@ -95,4 +101,3 @@
     seleccionarFrase endp
 end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-

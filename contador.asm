@@ -9,6 +9,8 @@
     tickCount dw 0
     counter dw 0
     buffer  db 6 dup(?)    ; buffer para el número convertido (max 5 digitos + '$')
+    contadorCPS dw 0
+    contadorWPS dw 0
 
 .code
 public contador
@@ -20,6 +22,9 @@ contador proc
     push dx
     push di
 
+    mov contadorCPS, bx
+    mov contadorWPS, si
+
     ; === Leer reloj BIOS ===
     mov ah, 00h
     int 1Ah
@@ -28,13 +33,13 @@ contador proc
     ; === Si no cambió el tick, salimos rápido ===
     mov ax, newTick
     cmp ax, oldTick
-    je .salir
+    je .cps
     mov oldTick, ax
 
     ; === Contamos ticks (cada tick ≈ 55 ms); 18 ticks ≈ 1 s ===
     inc tickCount
     cmp tickCount, 18
-    jb .salir
+    jb .cps
     mov tickCount, 0
     inc counter
 
@@ -54,13 +59,40 @@ contador proc
     lea bx, buffer
 .imprimir:
     cmp byte ptr [bx], '$'
-    je .salir
+    je .cps
     mov ah, 0Eh
     mov al, [bx]
     int 10h
     inc bx
     jmp .imprimir
+.cps:
+    ;-------------- MOSTRAR CPS -------------
+    mov ax, contadorCPS
+    cwd
+    mov bx, counter
+    cmp bx, 0
+    je .skipCPS
+    div bx
+    lea di, buffer
+    call convertirNumero
 
+    mov ah, 02h
+    mov bh, 0
+    mov dh, 3
+    mov dl, 70
+    int 10h
+
+    lea bx, buffer
+.imprimirCPS:
+    cmp byte ptr [bx], 24h
+    je .skipCPS
+    mov ah, 0Eh
+    mov al, [bx]
+    int 10h
+    inc bx
+    jmp .imprimirCPS
+.skipCPS:
+;---------------------------------
 .salir:
     pop di
     pop dx
@@ -90,12 +122,12 @@ convertirNumero proc
 
 .writeLoop:
     pop dx
-    add dl, '0'
-    mov [di], dl
+    add dl,'0'
+    mov [di],dl
     inc di
-    loop .writeLoop
-
-    mov byte ptr [di], '$'
+    dec cx
+    jnz .writeLoop
+    mov byte ptr [di],'$'
 
     pop dx
     pop cx

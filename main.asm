@@ -9,6 +9,8 @@
     contadorErrores db 0
     columna db 0
     fila db 0
+    contadorCPS dw 0
+    contadorWPS dw 0
 
 .code
     extrn errores:proc
@@ -31,7 +33,13 @@ main proc
 
 ;---------------------- CONTADOR DE ERRORES Y DE ACIERTOS------------------------------
 bucleJuego:
+    push bx
+    mov bx, contadorCPS
+    push si
+    mov si, contadorWPS
     call contador       ; actualiza contador si corresponde (no bloqueante)
+    pop si
+    pop bx
     
     llamoErrores:
     mov al, contadorErrores
@@ -67,6 +75,20 @@ bucleJuego:
 
     acierto:
     inc si
+
+    inc contadorCPS
+
+    cmp al, ' '
+    je EsPalabra
+    cmp al, 0dh
+    je esPalabra
+    jmp noEsPalabra
+    esPalabra:
+    inc contadorWPS
+    ; Aún no lo codee para imprimirlo
+    
+    noEsPalabra:
+    mov bl, al
     ; calcular posición del * abajo de la frase
     mov dh, 12           ; fila debajo de la frase
     mov dl, 10
@@ -74,7 +96,7 @@ bucleJuego:
     mov ah, 2
     int 10h              
  
-    mov al, "*"
+    mov al, bl
     ; imprimir el caracter en AL
     mov ah, 0Eh
     int 10h
@@ -112,7 +134,7 @@ imprimirFrase proc
         mov ah, 2
         int 10h 
 
-        lea bx, fraseInicial
+    lea bx, fraseInicial
 bucleImprimirFrase:             ;copia la frase tmb en la variable local para comparar luego en el juego
         cmp byte ptr [si], 24h
         je termineDeImprimir
