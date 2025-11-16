@@ -2,6 +2,9 @@ hola como estas soy la primer frase
 soy la 2da frase de frases.txt
 estas listo para la prueba de mecanografia mas dificil de la historia
 el mejor profesor de todos es pedro o fabio
+Vivo en Parangaricutirimicuaro, lindo lugar
+El arzobispo de Constantinopla tiene hipopotomostrosesquipedaliofobia 
+Los rios corren rapidos, rispidos
 esta es la frase numero 5 por ejemplo y hay muchas mas
 esta es la frase numero 5 por ejemplo y hay muchas mas
 esta es la frase numero 5 por ejemplo y hay muchas mas
@@ -46,6 +49,4 @@ esta es la frase numero 5 por ejemplo y hay muchas mas
 esta es la frase numero 5 por ejemplo y hay muchas mas
 esta es la frase numero 5 por ejemplo y hay muchas mas
 esta es la frase numero 5 por ejemplo y hay muchas mas
-esta es la frase numero 5 por ejemplo y hay muchas mas
-esta es la frase numero 5 por ejemplo y hay muchas mas
-esta es la frase numero 5 por ejemplo y hay muchas mas
+
