@@ -22,6 +22,7 @@
 	ayudaTxt6 db "Dificil: 15s para tipear 3 frases de nivel avanzado, SIN ERRORES",0dh,0ah,24h
 	ayudaTxt7 db "Completa todos los modos y coronate como el amo de la mecanografia!",0dh,0ah,24h
 	ayudaTxt8 db "SAL DE ESTE MENU CON LA TECLA ESC",0dh,0ah,24h
+	mover db "Te moves por el menu con W o S y Enter para ingresar",0dh,0ah,24h
 .code
 	public menu
 	proc menu
@@ -29,6 +30,7 @@
 	mov ds,ax
 tituloPrinc:
 	call cls
+
 
 	mov ah,01h
 	mov ch,0026h
@@ -100,19 +102,18 @@ selectorJugar:
 	lea dx, jugar
 	int 21h
 
+
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
 	mov dl,25 ; columna
 	int 10h
-
-	mov bl,1
-	mov ax, 1003h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color (amarillo claro, fondo negro)
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
 	int 10h
-
-	mov ah,9
-	lea dx, flecha
-	int 21h
 
 	mov ah,02h
 	mov bh,0
@@ -136,7 +137,7 @@ selectorJugar:
 
 	mov ah,1
 	int 21h
-		call minusculizar
+	call minusculizar
 
 	cmp al,"s"
 	je AyudaSelect
@@ -167,14 +168,13 @@ AyudaSelect:
 	mov dh,15 ; fila
 	mov dl,25 ; columna
 	int 10h
-
-	mov bl,1
-	mov ax, 1003h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color (amarillo claro, fondo negro)
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
 	int 10h
 
-	mov ah,9
-	lea dx, flecha
-	int 21h
 
 	mov ah,02h
 	mov bh,0
@@ -232,14 +232,14 @@ SalirSelect:
 	mov dh,17 ; fila
 	mov dl,25 ; columna
 	int 10h
-
-	mov bl,1
-	mov ax, 1003h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
 	int 10h
 
-	mov ah,9
-	lea dx, flecha
-	int 21h
+
 
 	mov ah,02h
 	mov bh,0
@@ -309,10 +309,13 @@ facilSelect:
 	mov dh,11 ; fila
 	mov dl,25 ; columna
 	int 10h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
+	int 10h
 
-	mov ah,9
-	lea dx, flecha
-	int 21h
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
@@ -394,10 +397,12 @@ normalSelect:
 	mov dh,13 ; fila
 	mov dl,25 ; columna
 	int 10h
-
-	mov ah,9
-	lea dx, flecha
-	int 21h	
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
+	int 10h
 
 	mov ah,1
 	int 21h
@@ -445,10 +450,13 @@ dificilSelect:
 	mov dh,15 ; fila
 	mov dl,25 ; columna
 	int 10h
-
-	mov ah,9
-	lea dx, flecha
-	int 21h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
+	int 10h
+	
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
@@ -930,4 +938,17 @@ esMayus:
 terminar:
 	ret
 	endp minusculizar
+
+	proc cantidadCaracteres
+	xor cl,cl
+cantidad:
+	cmp [bx],24h
+	je terminarDeInc
+	inc bx
+	inc cl
+	jmp cantidad
+terminarDeInc:
+	xor bx,bx
+	ret
+cantidadCaracteres endp
 end
