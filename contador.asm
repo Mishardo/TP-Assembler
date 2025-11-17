@@ -10,7 +10,9 @@
     counter dw 0
     buffer  db 6 dup(?)    ; buffer para el número convertido (max 5 digitos + '$')
     contadorCPS dw 0
-    contadorWPS dw 0
+
+    UltimoCPS db 0
+    ultimoWPM db 0
 
 .code
 public contador
@@ -21,9 +23,9 @@ contador proc
     push cx
     push dx
     push di
+    push si
 
     mov contadorCPS, bx
-    mov contadorWPS, si
 
     ; === Leer reloj BIOS ===
     mov ah, 00h
@@ -76,24 +78,150 @@ contador proc
     lea di, buffer
     call convertirNumero
 
+    ;Contar largo de nuevos CPS
+    xor cx, cx
+    lea si, buffer
+
+.contarLargoCPS:
+    cmp byte ptr [si], '$'
+    je .finContarLargoCPS
+    inc cx
+    inc si
+    jmp .contarLargoCPS
+.finContarLargoCPS:
+
+
+    ;Mover el cursor a la pos de los CPS
     mov ah, 02h
     mov bh, 0
     mov dh, 3
     mov dl, 70
     int 10h
 
-    lea bx, buffer
+
+    ;Borrar si el nro largo es menor
+    mov al, ultimoCPS     ; al = largo anterior
+    sub al, cl            ; AL = diferencia
+    jle .noBorrarCPS      ; si no disminuyó, no borrar
+
+    mov bl, al            ; BL = cuántos borrar
+
+.borrarCPSExtra:
+    add bl, 70
+
+    mov ah, 02h
+    mov bh, 0
+    mov dh, 3
+    mov dl, bl
+    int 10h
+
+    mov ah, 0Eh
+    mov al, ' '
+    int 10h
+    sub bl, 70
+    dec bl
+    jnz .borrarCPSExtra
+
+.noBorrarCPS:
+    mov ultimoCPS, cl     ; guardar largo actual
+
+    ;Volver a la pos para imprimir los CPS
+    mov ah, 02h
+    mov bh, 0
+    mov dh, 3
+    mov dl, 70
+    int 10h
+
+
+    ;IMPRIMIR CPS 
+    lea si, buffer
 .imprimirCPS:
-    cmp byte ptr [bx], 24h
+    cmp byte ptr [si], '$'
     je .skipCPS
+    mov ah, 0Eh
+    mov al, [si]
+    int 10h
+    inc si
+    jmp .imprimirCPS
+
+.skipCPS:
+;--------- MOSTRAR WMP ----------------
+.wpm:
+    ; AX = contador de caracteres
+    mov ax, contadorCPS
+    cwd
+    mov bx, counter     ; BX = tiempo en segundos
+    cmp bx, 0
+    je .skipWPM        ; evitar división entre cero
+    div bx              ; AX = CPS (caracteres por segundo)
+
+    ; Convertir CPS → WPM
+    mov bx, 12
+    mul bx              ; AX = CPS * 12 = WPM
+
+    ; Convertir resultado a cadena en "buffer"
+    lea di, buffer
+    call convertirNumero
+
+    ;-------------- CONTAR LARGO DEL WPM -------------
+    xor cx, cx          ; CX = largo
+    lea si, buffer
+.contarLargoWPM:
+    cmp byte ptr [si], '$'
+    je .finContarLargoWPM
+    inc cx
+    inc si
+    jmp .contarLargoWPM
+.finContarLargoWPM:
+    ;-------------- BORRAR CARACTERES SOBRANTES -------------
+    mov al, ultimoWPM
+    sub al, cl
+    jle .noBorrarWPM        ; si no bajó, no borrar
+
+    mov bl, al              ; bl = cuántos borrar
+
+    ; posicionar al final del número anterior:
+    mov ah, 02h
+    mov bh, 0
+    mov dh, 4               ; fila WPM
+    mov dl, 70
+    add dl, ultimoWPM
+    dec dl                  ; DL = última cifra
+    int 10h
+
+.borrarWPMExtra:
+    mov ah, 0Eh
+    mov al, ' '
+    int 10h
+    dec dl
+    dec bl
+    jnz .borrarWPMExtra
+.noBorrarWPM:
+    mov ultimoWPM, cl       ; guardar largo actual
+
+    mov ah, 02h
+    mov bh, 0
+    mov dh, 4           ; fila
+    mov dl, 70          ; columna
+    int 10h
+
+    lea bx, buffer
+
+.imprimirWPM:
+    cmp byte ptr [bx], 24h 
+    je .skipWPM
+
     mov ah, 0Eh
     mov al, [bx]
     int 10h
+
     inc bx
-    jmp .imprimirCPS
-.skipCPS:
+    jmp .imprimirWPM
+
+.skipWPM:
 ;---------------------------------
 .salir:
+    pop si
     pop di
     pop dx
     pop cx

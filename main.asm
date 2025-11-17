@@ -3,6 +3,10 @@
 .model small
 .stack 100h
 .data
+    textoTiempo db "Tiempo: ",0
+    textoCPS db "CPS: ",0
+    textoWPM db "WPM: ",0
+
     fraseInicial db 255 dup(24h)
     letraUsuario db ?         ; donde guardo la tecla apretada
     posAcierto   db 0         ; cuántos aciertos llevo (para saber dónde poner los *)
@@ -10,7 +14,6 @@
     columna db 0
     fila db 0
     contadorCPS dw 0
-    contadorWPS dw 0
 
 .code
     extrn errores:proc
@@ -28,17 +31,68 @@ main proc
     int 10h
     
     call imprimirFrase ; imprime la frase inicial
-    lea si, fraseInicial
 ;-------------------------------------------------------------------------
+    mov ah, 02h 
+    mov bh, 0
+    mov dh, 2
+    mov dl, 60
+    int 10h
 
+    mov ah, 0Eh 
+    lea si, textoTiempo
+imprimirTiempo:
+    mov al, [si]
+    cmp al, 0
+    je finImprimirTiempo
+    int 10h
+    inc si
+    jmp imprimirTiempo
+
+finImprimirTiempo:
+
+    mov ah, 02h 
+    mov bh, 0
+    mov dh, 3
+    mov dl, 60
+    int 10h
+
+    mov ah, 0Eh 
+    lea si, textoCPS
+
+imprimirCPS:
+    mov al, [si]
+    cmp al, 0
+    je finImprimirCPS
+    int 10h
+    inc si
+    jmp imprimirCPS
+
+finImprimirCPS:
+
+    mov ah, 02h 
+    mov bh, 0
+    mov dh, 4
+    mov dl, 60
+    int 10h
+
+    mov ah, 0Eh 
+    lea si, textoWPM
+
+imprimirWPM:
+    mov al, [si]
+    cmp al, 0
+    je finImprimirWPM
+    int 10h
+    inc si
+    jmp imprimirWPM
+
+finImprimirWPM:
+lea si, fraseInicial
 ;---------------------- CONTADOR DE ERRORES Y DE ACIERTOS------------------------------
 bucleJuego:
     push bx
     mov bx, contadorCPS
-    push si
-    mov si, contadorWPS
     call contador       ; actualiza contador si corresponde (no bloqueante)
-    pop si
     pop bx
     
     llamoErrores:
@@ -78,16 +132,6 @@ bucleJuego:
 
     inc contadorCPS
 
-    cmp al, ' '
-    je EsPalabra
-    cmp al, 0dh
-    je esPalabra
-    jmp noEsPalabra
-    esPalabra:
-    inc contadorWPS
-    ; Aún no lo codee para imprimirlo
-    
-    noEsPalabra:
     mov bl, al
     ; calcular posición del * abajo de la frase
     mov dh, 12           ; fila debajo de la frase
