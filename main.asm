@@ -15,15 +15,44 @@
     fila db 0
     
     contadorCPS dw 0
+    nivel db 0
+    limiteTiempo db 0
+    limiteErrores db 0
 
 .code
     extrn errores:proc
     extrn contador:proc
     extrn frase:proc
-
+    extrn menu:proc
+    extrn perdiste:proc
+    extrn puntajes:proc
+    public main
 main proc
     mov ax,@data
     mov ds,ax
+    mov contadorErrores,0
+    call menu
+    mov nivel,dl ; menu me devuelve por dl el nivel
+    cmp nivel,1; comparo para saber que nivel me devolvio y en base a eso setear las variables
+    je facilSet
+    cmp nivel,2
+    je medioSet
+    cmp nivel,3
+    je dificilSet
+    jmp seguir
+facilSet:
+    mov limiteTiempo,30
+    mov limiteErrores,10
+    jmp seguir
+medioSet:
+    mov limiteTiempo,20
+    mov limiteErrores,5
+    jmp seguir
+dificilSet:
+    mov limiteTiempo,15
+    mov limiteErrores,1
+    jmp seguir
+seguir: ; Seguir es una funcion auxiliar para indicar que termino de setear
 
 ;---------------------- IMPRESION DE LA FRASE ---------------------------
     ; poner modo texto o limpiar pantalla si querés
@@ -45,10 +74,15 @@ imprimirTiempo:
     mov al, [si]
     cmp al, 0
     je finImprimirTiempo
+    cmp al,limiteTiempo
+    je terminoRonda
     int 10h
     inc si
     jmp imprimirTiempo
-
+terminoRonda:
+    mov dl,contadorErrores
+    mov dh,contadorCPS
+    call puntajes
 finImprimirTiempo:
 
     mov ah, 02h 
@@ -98,11 +132,15 @@ bucleJuego:
     
     llamoErrores:
     mov al, contadorErrores
+
     guardoPuntero:
     mov [fila],dh       ;guardo la columna y la fila, porque errores la modifica. asi la restauro luego
     mov [columna], dl
     call errores
 
+    jmp restauroPuntero
+perdisteJmp:
+    call perdiste
     restauroPuntero:
     mov dh, [fila]
     mov dl, [columna]
@@ -126,6 +164,10 @@ bucleJuego:
 
     error:
     inc contadorErrores
+    xor al,al
+    mov al,contadorErrores
+    cmp al,limiteErrores
+    je perdisteJmp
     jmp bucleJuego
 
     acierto:
