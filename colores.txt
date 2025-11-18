@@ -1,0 +1,34 @@
+mov ah, 09h
+int 10h
+mov bl, COLOR
+-- 16 colores de caracter:
+0	Negro
+1	Azul
+2	Verde
+3	Cian
+4	Rojo
+5	Magenta
+6	Marrón / Amarillo oscuro
+7	Gris claro
+8	Gris oscuro
+9	Azul brillante
+10 (0Ah)	Verde brillante
+11 (0Bh)	Cian brillante
+12 (0Ch)	Rojo brillante
+13 (0Dh)	Magenta brillante
+14 (0Eh)	Amarillo
+15 (0Fh)	Blanco brillante
+
+-- 7 colores de fondo:
+0	Negro
+1	Azul
+2	Verde
+3	Cian
+4	Rojo
+5	Magenta
+6	Marrón / Amarillo oscuro
+7	Gris claro
+
+EJ: 
+mov bl, 15h (fondo azul, caracter magenta)
+mov bl, 0Ah (fondo negro, caracter verde brillante)
