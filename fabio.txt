@@ -1,0 +1,20 @@
+El flip consiste cambiar los 0 en 1 y viceversa
+Ca2 es hacer Ca1 y sumar 1, es muy facil de recordar!
+Al trabajar con binarios haz las sumas operaciones con calculadora, tu mente esta programada para usar el sistema decimal y se puede trabar
+Los registros almacenan n bits o celdas, cada celda almacena 1 bit y si pierden la energia, pierden los datos.
+El orden en la que se guardan los datos en un registro puede se Little Endian o Big Endian
+Las memorias estaticas RAM o Static RAM son aquellas que mantienen sus datos siempre que haya alimentacion
+Las DRAM necesitan un pulso de energia periodico para mantener los datos
+Las memorias Random Access pueden acceder a cualquier espacio de memoria directamente no importa la ubicacion
+Las ROM se graban en la fabricación y no se pueden cambiar.
+Las EEPROM las programa el usuario con electricidad y se pueden borrar celda por celda con una tension de polarizacion inversa
+La memoria cache es una memoria pequeña muy rápida que mantiene una parte de los datos de MP que se usan frecuentemente.
+La organizacion asociativa necesita algoritmos de busqueda complejos pero tiene una buena tasa de aciertos
+La memoria virtual esta en las unidades de almacenamiento secundario, cuando el procesador acceda a una direccion virtual, la traduce
+La capacidad de direccionamiento en el espacio virtual depende de la cantidad de bits del bus de direcciones.
+El espacio real esta limitado por la cantidad de memoria RAM fisica disponible
+INT 0: divide error esta relacionada con un error de division, en 8086 solo ocurre al dividir por 0
+En 8086 existen ahas 256 tipos de interrupciones!
+Las interrupciones por hardware son procedimientos causado por un evento externo que produce una transferencia impredecible de control.
+La arquitectura RISC se basa en el modelo de Harvard
+Con 16 bits se puede tener 65.536 direcciones de memoria
