@@ -13,6 +13,7 @@
     contadorErrores db 0
     columna db 0
     fila db 0
+    
     contadorCPS dw 0
 
 .code
@@ -129,24 +130,27 @@ bucleJuego:
 
     acierto:
     inc si
-
     inc contadorCPS
+    mov bl, al          ; guardar carácter a imprimir
 
-    mov bl, al
-    ; calcular posición del * abajo de la frase
-    mov dh, 12           ; fila debajo de la frase
+    ; Mover cursor a fila/col deseada
+    mov ah, 02h         ; set cursor position
+    mov bh, 0           ; página
+    mov dh, 11          ; fila
     mov dl, 10
-    add dl, posAcierto   ; desplazamiento horizontal porque sino es un quilombo tengo un contador para saber en q letra voy
-    mov ah, 2
-    int 10h              
- 
-    mov al, bl
-    ; imprimir el caracter en AL
-    mov ah, 0Eh
+    add dl, posAcierto  ; desplazamiento horizontal
+    int 10h
+
+    ; Imprimir carácter con color
+    mov ah, 09h         ; write char + attr
+    mov al, bl          ; carácter
+    mov bh, 0           ; página
+    mov bl, 0Bh         ; color (mirar colores.txt)
+    mov cx, 1           ; imprimir una vez
     int 10h
 
     inc posAcierto
-;;-----------------------------------------------------------
+;;----------------------------------------------------------
 
 ;---------------------- FIN DEL JUEGO ----------------------
     cmp byte ptr[si], "$"
