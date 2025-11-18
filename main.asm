@@ -15,6 +15,8 @@
     columna db 0
     fila db 0
 
+    frasesCompletadas db 0 ;cuantas palabras voy completando
+
     buffer  db 6 dup(?)
 
     contadorCPS dw 0
@@ -98,6 +100,7 @@ finImprimirWPM:
 lea si, fraseInicial
 ;---------------------- CONTADOR DE ERRORES Y DE ACIERTOS------------------------------
 bucleJuego:
+
     push bx
     mov bx, contadorCPS
     push si
@@ -123,6 +126,30 @@ bucleJuego:
     mov ah, 02h
     mov bh, 0
     int 10h
+
+
+    ; Chequear si se completó la frase
+    mov al, [si]
+    cmp al, 24h        ; carácter '$'
+    je completeFrase
+    cmp al, 0          ; carácter nulo
+    je completeFrase
+    jmp noCompleteFrase
+
+
+completeFrase:
+
+cargoNuevaFrase:
+    inc frasesCompletadas
+    call limpiarV           ; limpia fraseInicial local
+    call imprimirFrase      ; obtiene nueva frase y la copia a fraseInicial
+    lea si, fraseInicial    ; SI apunta al inicio de la nueva frase
+    mov posAcierto, 0
+    cmp frasesCompletadas, 5
+    je finPrograma
+    jmp continuarJuego
+
+noCompleteFrase:
 
     ; Chequear teclado (sin bloquear): INT16 AH=01
     mov ah, 01h
@@ -167,9 +194,8 @@ bucleJuego:
 ;;----------------------------------------------------------
 
 ;---------------------- FIN DEL JUEGO ----------------------
-    cmp byte ptr[si], "$"
-    je finPrograma
 
+continuarJuego:
     jmp bucleJuego
 
 finPrograma:
@@ -187,42 +213,84 @@ main endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCIONES INTERNAS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imprimirFrase proc
-
     push bp
     mov bp, sp
     push bx
     push ax
     push dx
+    push si
+    push di
+    push cx
+
+    ; LIMPIAR la línea de la frase original (blanco)
+    mov ah, 02h         ; posicionar cursor
+    mov bh, 0
+    mov dh, 11          ; fila de la frase
+    mov dl, 10          ; columna inicial
+    int 10h
+    
+    mov cx, 100         ;número de espacios a limpiar
+    mov ah, 0Ah         ;escribir carácter
+    mov al, ' '         ; espacio
+    mov bh, 0
+limpiarLineaFrase:
+    int 10h
+    inc dl
+    mov ah, 02h
+    int 10h
+    mov ah, 0Ah
+    loop limpiarLineaFrase
+
+    ; LIMPIAR la línea de aciertos (caracteres en color)
+    mov ah, 02h         ; posicionar cursor
+    mov bh, 0
+    mov dh, 11          ; misma fila
+    mov dl, 10          ; misma columna inicial
+    int 10h
+    
+    mov cx, 100          ; número de espacios a limpiar
+    mov ah, 09h         ; usar función de escribir con atributo
+    mov al, ' '         ; espacio
+    mov bh, 0
+    mov bl, 07h         ; color blanco normal
+    mov cx, 100          ; limpiar 50 caracteres de una vez
+    int 10h
+
+    ; AHORA imprimir la nueva frase
+    mov ah, 02h         ; reposicionar cursor al inicio
+    mov bh, 0
+    mov dh, 11
+    mov dl, 10
+    int 10h
 
     call frase
     mov si, bx
+    lea di, fraseInicial
 
-        mov dh, 11; FILA (0 25)
-        mov dl, 10 ; COLUMNA (0 80)
-        mov bh, 0
-        mov ah, 2
-        int 10h 
-
-    lea bx, fraseInicial
-bucleImprimirFrase:             ;copia la frase tmb en la variable local para comparar luego en el juego
-        cmp byte ptr [si], 24h
-        je termineDeImprimir
-        mov ah, 0eh
-        mov al, [si]
-        mov byte ptr[bx], al
-        int 10h
-        inc si
-        inc bx
-        jmp bucleImprimirFrase
+bucleImprimirFrase:
+    cmp byte ptr [si], 24h
+    je termineDeImprimir
+    mov ah, 0eh
+    mov al, [si]
+    mov byte ptr [di], al
+    int 10h
+    inc si
+    inc di
+    jmp bucleImprimirFrase
 
 termineDeImprimir:
+    mov byte ptr [di], 24h
+    
+    pop cx
+    pop di
+    pop si
     pop dx
     pop ax
     pop bx
     pop bp
-
     ret 
 imprimirFrase endp
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;80x25
 imprimirResultados proc
@@ -318,6 +386,24 @@ convertirNumero proc
     pop ax
     ret
 convertirNumero endp
+
+limpiarV proc
+    push bp
+    push dx
+    mov bp, sp
+
+    mov cx, 255
+    lea di, fraseInicial  
+    limpiar_loop:
+        mov byte ptr [di], 24h
+        inc di
+        loop limpiar_loop
+
+    pop dx
+    pop bp
+    ret
+
+limpiarV endp
 
 
 

@@ -5,37 +5,40 @@
     arch1		db 'frases.txt',0
     buf1		db 4096 dup(?)
     fraseSeleccionada db ?
+    fraseInicial db 255 dup(24h)
     cartel db "error abrir archivo",0ah,0dh,24h
+    archivoAbierto db 0  ; 0 = cerrado, 1 = abierto
 
 .code
+    PUBLIC frase    
+    PUBLIC fraseInicial
 
-    PUBLIC frase 
-
-    frase proc
-    ; RECIBE POR PARAMETRO: NADA
-    ; Devuelve en: ??
-    
+frase proc
     push bp
     mov bp, sp
 
+    call limpiarV
+    
     ;-------- Abrir el archivo ----------
     mov ah, 3Dh
-    mov al, 0
+    mov al, 0           ; modo lectura
     mov dx, offset arch1
     int 21h
     jc errorAbrirArchivo
 
     ;------ Leer el archivo -------------
-    mov bx, ax        ; handle
+    mov bx, ax          ; handle
     mov ah, 3Fh
     mov cx, 4095
-    int 21h           ; lee hasta 255 bytes
+    mov dx, offset buf1 ; buffer donde guardar
+    int 21h
+    jc errorLeerArchivo
 
     ;------ Cerrar el archivo -------
     mov ah, 3Eh
     int 21h
 
-    ;-------- Seleccionar aleatorio entre 0 y 50 ------
+    ;-------- Seleccionar aleatorio ------
     mov ah, 00h
     int 1Ah
     mov ax, dx
@@ -43,61 +46,90 @@
     xor dx, dx
     div bx
     mov fraseSeleccionada, dl
-    ;---------------------------------------------------
 
     call seleccionarFrase
+    mov bx, offset fraseInicial
 
     pop bp
     ret
 
+errorLeerArchivo:
+    ; Cerrar archivo si hubo error de lectura
+    mov ah, 3Eh
+    int 21h
 
-    errorAbrirArchivo:
+errorAbrirArchivo:
     mov bx, offset cartel
     pop bp
     ret
-    
-    frase endp
+frase endp
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCION EXTERNA ;;;;;;;;;;;;;;;;;;;;;;;;
-    ; luego quiero agregarle un nro aleatorio y que ponga el offset al inicio de luego de un salto de linea y el signo pesos al final de esa linea
-    seleccionarFrase proc
-    ;RECIBE POR PARAMETRO: NADA
-    ;Devuelve en: ??
-
+seleccionarFrase proc
     mov si, offset buf1
-    mov cl, 1                ; contador de líneas actuales
-    mov al, fraseSeleccionada
+    mov di, offset fraseInicial
 
-    buscar_inicio:
-        cmp cl, al
-        je  linea_encontrada        ;cuenta los saltos de linea para encontrar la linea aleatoria que toca.
-        cmp byte ptr [si], 0
-        je  fin_archivo
-        cmp byte ptr [si], 0Ah
-        jne continuar
-        inc cl
-    continuar:
-        inc si
-        jmp buscar_inicio
+    mov cl, 1                    ; línea actual
+    mov al, fraseSeleccionada    ; línea buscada
 
-    linea_encontrada:
-        mov bx, si              ; guardar inicio de la línea seleccionada
-    buscar_fin:
-        cmp byte ptr [si], 0        ;recorre para encontrar el final
-        je fin_linea
-        cmp byte ptr [si], 0Ah
-        je fin_linea
-        inc si
-        jmp buscar_fin
+buscar_inicio:
+    cmp cl, al
+    je copiar_linea
 
-    fin_linea:
-        mov byte ptr [si], '$'  ; poner fin de cadena
-        ret
+    cmp byte ptr [si], 0
+    je fin_archivo
 
-    fin_archivo:
-        mov byte ptr [si], '$'
-        ret
+avanzar_linea:
+    cmp byte ptr [si], 0Ah       ; salto de línea
+    je siguiente_linea
+    cmp byte ptr [si], 0         ; fin de archivo
+    je fin_archivo
+    inc si
+    jmp avanzar_linea
 
-    seleccionarFrase endp
+siguiente_linea:
+    inc si
+    inc cl
+    jmp buscar_inicio
+
+copiar_linea:
+    cmp byte ptr [si], 0Ah
+    je terminar
+    cmp byte ptr [si], 0Dh       ; retorno de carro
+    je terminar
+    cmp byte ptr [si], 0         ; fin de archivo
+    je terminar
+    mov al, [si]
+    mov [di], al
+    inc si
+    inc di
+    jmp copiar_linea
+
+terminar:
+    mov byte ptr [di], '$'
+    ret
+
+fin_archivo:
+    mov byte ptr [di], '$'
+    ret
+seleccionarFrase endp
+
+limpiarV proc
+    push bp
+    push cx
+    push di
+    mov bp, sp
+
+    mov cx, 255
+    lea di, fraseInicial
+limpiar_loop:
+    mov byte ptr [di], 24h
+    inc di
+    loop limpiar_loop
+
+    pop di
+    pop cx
+    pop bp
+    ret
+limpiarV endp
+
 end
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
