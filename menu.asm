@@ -22,7 +22,15 @@
 	ayudaTxt6 db "Dificil: 15s para tipear 3 frases de nivel avanzado, SIN ERRORES",0dh,0ah,24h
 	ayudaTxt7 db "Completa todos los modos y coronate como el amo de la mecanografia!",0dh,0ah,24h
 	ayudaTxt8 db "SAL DE ESTE MENU CON LA TECLA ESC",0dh,0ah,24h
-	mover db "Te moves por el menu con W o S y Enter para ingresar",0dh,0ah,24h
+	mover db "Te moves con W, S, Enter y Esc",24h
+	moverSalir db "Te moves con A, D, Enter y Esc",24h
+	creditos db "Creadores: Tomas M, David V, Thiago G R, Aliz T",24h
+	variableBuc db 25,24h
+	valorDesplaz db 3,24h
+	salirSeguro db "Estas seguro?",0dh,0ah,24h
+	siSalir db "Si",0dh,0ah,24h
+	noSalir db "No",0dh,0ah,24h
+	flechaArriba db "^",0dh,0ah,24h
 .code
 	public menu
 	proc menu
@@ -69,6 +77,10 @@ selectorDific:
 
 	ret
 fin:
+	jmp seguro
+seguro:
+	call seguroPrint
+finalReal:
 	mov ax,4c00h
 	int 21h
 	ret
@@ -91,7 +103,10 @@ fin:
 
 selectorJugar:
 	call cls
+
 	call tituloPixeles
+	call textoColor
+
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
@@ -152,6 +167,7 @@ JugarSeleccionado:
 AyudaSelect:
 	call cls
 	call tituloPixeles
+	call textoColor
 
 	mov ah,02h
 	mov bh,0
@@ -216,6 +232,7 @@ selectorJugarJmp:
 SalirSelect:
 	call cls
 	call tituloPixeles
+	call textoColor
 
 	mov ah,02h
 	mov bh,0
@@ -315,7 +332,7 @@ facilSelect:
 	mov bh, 0     
 	mov cx, 1     ; imprimir 1 vez
 	int 10h
-
+	
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
@@ -456,7 +473,6 @@ dificilSelect:
 	mov bh, 0     
 	mov cx, 1     ; imprimir 1 vez
 	int 10h
-	
 	mov ah,02h
 	mov bh,0
 	mov dh,13 ; fila
@@ -501,7 +517,7 @@ final:
 	proc ayudaPrint
 ayudaPrintBuc:
 	call cls 
-
+	call creditosTxt
 	mov ah,02h
 	mov bh,0
 	mov dh,3 ; fila
@@ -942,7 +958,7 @@ terminar:
 	proc cantidadCaracteres
 	xor cl,cl
 cantidad:
-	cmp [bx],24h
+	cmp byte ptr [bx],24h
 	je terminarDeInc
 	inc bx
 	inc cl
@@ -951,4 +967,595 @@ terminarDeInc:
 	xor bx,bx
 	ret
 cantidadCaracteres endp
+	proc textoColor ; Este estilo de funcion se repite a lo largo del codigo
+	push ax ; porque cada funcion depende de la posicion, color, y el texto que se vayan a usar en el
+	push bx ; momento
+	push dx
+	push cx
+	xor si,si
+	mov valorDesplaz,0
+	mov variableBuc,30
+	lea si,mover
+bucleColor:
+
+	cmp variableBuc,0
+	je terminoColor
+	mov ah,02h
+	mov bh,0
+	mov dh,23 ; fila
+	mov dl,1 ; columna
+	add dl,valorDesplaz
+	int 10h
+	mov ah, 09h
+
+	mov al, [si]
+	mov bl, 0Eh
+	mov bh, 0     
+	mov cx, 1
+	int 10h
+	inc si
+	inc valorDesplaz
+	dec variableBuc
+	jmp bucleColor
+terminoColor:
+	pop cx
+	pop dx
+	pop bx
+	pop ax
+	ret
+	textoColor endp
+	proc creditosTxt
+	push ax
+	push bx
+	push dx
+	push cx
+	xor si,si
+	mov valorDesplaz,0
+	mov variableBuc,47
+	lea si,creditos
+bucleCreditos:
+
+	cmp variableBuc,0
+	je terminoCreditos
+	mov ah,02h
+	mov bh,0
+	mov dh,23 ; fila
+	mov dl,4 ; columna
+	add dl,valorDesplaz
+	int 10h
+	mov ah, 09h
+
+	mov al, [si]
+	mov bl, 7
+	mov bh, 0     
+	mov cx, 1
+	int 10h
+	inc si
+	inc valorDesplaz
+	dec variableBuc
+	jmp bucleCreditos
+terminoCreditos:
+	pop cx
+	pop dx
+	pop bx
+	pop ax
+	ret
+	creditosTxt endp	
+
+
+	proc seguroPrint
+siSalirSelect:
+	call cls
+	call cuadradoSalir
+	call estasSeguroColor
+
+	mov ah,02h
+	mov bh,0
+	mov dh,8; fila
+	mov dl,14 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, salirSeguro
+	int 21h
+	mov ah,02h
+	mov bh,0
+	mov dh,15; fila
+	mov dl,14 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, siSalir
+	int 21h
+	mov ah,02h
+	mov bh,0
+	mov dh,15; fila
+	mov dl,24 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, noSalir
+	int 21h
+
+	mov ah,02h
+	mov bh,0
+	mov dh,15 ; fila
+	mov dl,18 ; columna
+	int 10h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
+	int 10h
+	mov ah,1
+	int 21h
+	call minusculizar
+	cmp al,"d"
+	je noSalirSelect
+	cmp al,0dh
+	je finSaltar
+	cmp al,1bh
+	je volverMenu
+
+	jmp siSalirSelect
+noSalirSelect:
+	call cls
+	call cuadradoSalir
+	call estasSeguroColor
+	mov ah,02h
+	mov bh,0
+	mov dh,8; fila
+	mov dl,14 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, salirSeguro
+	int 21h
+	mov ah,02h
+	mov bh,0
+	mov dh,15; fila
+	mov dl,14 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, siSalir
+	int 21h
+	mov ah,02h
+	mov bh,0
+	mov dh,15; fila
+	mov dl,24 ; columna
+	int 10h
+
+	mov ah,9
+	lea dx, noSalir
+	int 21h
+
+	mov ah,02h
+	mov bh,0
+	mov dh,15 ; fila
+	mov dl,28 ; columna
+	int 10h
+	mov ah, 09h
+	mov al, '<'
+	mov bl, 0Bh   ; atributo de color
+	mov bh, 0     
+	mov cx, 1     ; imprimir 1 vez
+	int 10h
+	mov ah,1
+	int 21h
+	call minusculizar
+	cmp al,"a"
+	je siSalirSelectJmp
+	cmp al,0dh
+	je volverMenu
+	cmp al,1bh
+	je volverMenu
+	jmp noSalirSelect
+siSalirSelectJmp:
+	jmp siSalirSelect
+volverMenu:
+	jmp tituloPrinc
+finSaltar:
+	call cls
+	jmp finalReal
+finalSeguro:
+	ret
+	seguroPrint endp
+
+	proc estasSeguroColor
+	push ax
+	push bx
+	push dx
+	push cx
+	xor si,si
+	mov valorDesplaz,0
+	mov variableBuc,30
+	lea si,moverSalir
+bucleSalir:
+
+	cmp variableBuc,0
+	je terminoSalir
+	mov ah,02h
+	mov bh,0
+	mov dh,23 ; fila
+	mov dl,4 ; columna
+	add dl,valorDesplaz
+	int 10h
+	mov ah, 09h
+
+	mov al, [si]
+	mov bl, 0eh
+	mov bh, 0     
+	mov cx, 1
+	int 10h
+	inc si
+	inc valorDesplaz
+	dec variableBuc
+	jmp bucleSalir
+terminoSalir:
+	pop cx
+	pop dx
+	pop bx
+	pop ax
+	ret
+
+	estasSeguroColor endp
+
+
+	proc cuadradoSalir
+		mov dh,5 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,6 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,7 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,8 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,9 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,10 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,11 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,12 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,13 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,14 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,15 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,16 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,17 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,18 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,19 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,3 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,4 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,5 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,6 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,7 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,8 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,9 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,10 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,11 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,12 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,13 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,14 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,15 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,16 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,17 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,18 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,19 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,20 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,21 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,22 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,23 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,24 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,25 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,26 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,27 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,20 ; fila
+	mov dl,28 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,20 ; fila
+	mov dl,29 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,20 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,19 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,18 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,17 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,16 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,15 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,14 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,13 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,12 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,11 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,10 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,9 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,8 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,7 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,6 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,5 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner	
+	mov dh,5 ; fila
+	mov dl,30 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,29 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,28 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,27 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,26 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,25 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,24 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,23 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,22 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,21 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,20 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,19 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,18 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,17 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,16 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,15 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,14 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,13 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,12 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,11 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,10 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,9 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,8 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,7 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,6 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,5 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,4 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,3 ; columna
+	add dl,3
+	call pixelPoner
+	mov dh,5 ; fila
+	mov dl,2 ; columna
+	add dl,3
+	call pixelPoner
+	ret
+	cuadradoSalir endp
 end
