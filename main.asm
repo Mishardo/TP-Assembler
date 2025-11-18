@@ -3,9 +3,10 @@
 .model small
 .stack 100h
 .data
-    textoTiempo db "Tiempo: ",0
-    textoCPS db "CPS: ",0
-    textoWPM db "WPM: ",0
+    textoTiempo db "Tiempo: ",24h
+    textoTiempo2 db " segundos",24h
+    textoCPS db "CPS: ",24h
+    textoWPM db "WPM: ",24h
 
     fraseInicial db 255 dup(24h)
     letraUsuario db ?         ; donde guardo la tecla apretada
@@ -13,8 +14,14 @@
     contadorErrores db 0
     columna db 0
     fila db 0
-    
+
+    buffer  db 6 dup(?)
+
     contadorCPS dw 0
+    contadorWPM dw 0
+    tiempo dw 0
+
+    resultadoTexto db "RESULTADOS",24h
 
 .code
     extrn errores:proc
@@ -43,7 +50,7 @@ main proc
     lea si, textoTiempo
 imprimirTiempo:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirTiempo
     int 10h
     inc si
@@ -62,7 +69,7 @@ finImprimirTiempo:
 
 imprimirCPS:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirCPS
     int 10h
     inc si
@@ -81,7 +88,7 @@ finImprimirCPS:
 
 imprimirWPM:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirWPM
     int 10h
     inc si
@@ -93,8 +100,15 @@ lea si, fraseInicial
 bucleJuego:
     push bx
     mov bx, contadorCPS
+    push si
+    lea si, contadorWPM
+    push di
+    lea di, tiempo
     call contador       ; actualiza contador si corresponde (no bloqueante)
+    pop di
+    pop si
     pop bx
+
     
     llamoErrores:
     mov al, contadorErrores
@@ -159,6 +173,13 @@ bucleJuego:
     jmp bucleJuego
 
 finPrograma:
+    ;Mostrar resutados finales.
+    mov ah, 0
+    mov al, 03h
+    int 10h
+
+    call imprimirResultados
+    
     mov ax,4C00h
     int 21h
 main endp
@@ -203,4 +224,101 @@ termineDeImprimir:
     ret 
 imprimirFrase endp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;80x25
+imprimirResultados proc
+    ;Impresion texto 'Resultado'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 10 ; columna
+    mov dh, 4   ; fila
+    int 10h 
+
+    mov ah, 9
+    lea dx, resultadoTexto
+    int 21h
+
+    ;impresión texto 'WPM'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 6   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoWPM
+    int 21h
+
+    mov ax, contadorWPM
+    lea di, buffer
+    call convertirNumero
+
+    mov ah, 9
+    lea dx, buffer
+    int 21h
+    ;impresión 'Tiempo'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 7   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoTiempo
+    int 21h
+
+    mov ax, tiempo
+    lea di, buffer
+    call convertirNumero
+
+    mov ah, 9
+    lea dx, buffer
+    int 21h
+
+    lea dx, textoTiempo2
+    int 21h
+
+    ;Colocar colocar cursor debajo del texto así no molesta el 'C:\Tasm:>'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 8   ; fila
+    int 10h
+    
+    ret
+imprimirResultados endp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+convertirNumero proc
+    push ax
+    push bx
+    push cx
+    push dx
+    mov bx, 10
+    xor cx, cx
+
+.convLoop:
+    xor dx, dx
+    div bx           ; AX / 10 ; remainder in DX
+    push dx
+    inc cx
+    cmp ax, 0
+    jne .convLoop
+
+.writeLoop:
+    pop dx
+    add dl,'0'
+    mov [di],dl
+    inc di
+    dec cx
+    jnz .writeLoop
+    mov byte ptr [di],'$'
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+convertirNumero endp
+
+
+
 end
