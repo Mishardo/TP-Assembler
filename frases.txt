@@ -1,106 +1,20 @@
-Frases faciles: 10
 hola como estas soy la primer frase
-soy la 2da frase de frases.txt
+soy la 2da frase de frases faciles
 el mejor profesor de todos es pedro o fabio?
-Si tipeas esto eres noob
-Racing es mejor que BOCA
-Los chocolates cadbury son muy ricos, deberias comerlo
-El dulce de leche es argentino y no hay discusion
-Los gatos son muy lindos y apapuchables
-Me llamo Goku! o tambien Kakaroto
-Corruption is bad if i am not involved
-Its TV time!
-The cake is a LIE!
-Kris, where the hell are we!
-Caed en desesperacion granujas! Power a invadido este programa! jaja!
-Los cheetas son bastante amigable con los humanos
-Los ocelotes tambien son conocidos como Cunaguaros en Venezuela
-Mi abuela llama a los gatos con orejas grandes yuso
-Que es lo que desayunan los perros?
-Solo debes decirme si o guau, no necesito perros desobedientes
-Que tienen de malo mis pantalones?
-Frases Medio: 15
-Sabias que los videos de gatos componen el 15% del trafico digital mundial?
-Sabias que se descubrio una nueva raza de gato en Finlandia? se llama Salmiak
-El felino mas letal del mundo es el gato de patas negras
-El lince iberico es hermoso pero esta en peligro de extincion
-estas listo para la prueba de mecanografia mas dificil de la historia
-Una alma fuerte recide en una mente poderosa y un cuerpo saludable
-Crees que de veras existe un vinculo entre comer ninos y cantar?
-Por eso esperaba con la carita empapada. A que llegaras con rosas, con mil rosas para mí
-No le creas compadre! asi le dijeron a mi hermana y ahora tengo so-bri-ni-tos!
-Uno de los miembros del grupo le gusta boku no pico, no dire quien
-Mozilla es un muy buen navegador, deberian usarlo la verdad, esta bien bonito
-Pondría letras de las canciones de BTS pero que cosas... no soy fan del kpop
-Los tigres son tan lindos y peludos, una pena que te maten si los intentas abrazar
-Sabias que los gatos pueden entender a los humanos? Simplemente nos ignoran
-Aquí debería insertar una referencia a digimon, pero no me gusta digimon
-Los zorros son muy raros, parecen una mezcla entre un perro y un gato, demasiado raros
-El que tipee esto le encanta los nuggets de pollo con forma de dinosaurio
-Sabes que Jujuy tiene un terreno todo cubierto de sal? Salinas grandes
-Recuerda pestanear y tomar agua despues de esta sesion de tipeo, cuida tu salud
-Cual es el motivo, por el cual aun vivo? Cada noche mis recuerdos se van perdiendo
-Fraces dificiles: 20
-No se que version de linux instalar porque tengo miedo a perder acceso a varias cosas de microsoft
-Los gatos de raza Salmiak reciben su nombre debido a un dulce de regaliz salado popular en Finlandia
-Quiero hacer un trato contigo Denji, te entrego mi corazon y a cambio me mostraras tus suenos
-You can go fast, because you can, but you really, REALLY shouldnt!
-Los nuggets de pollo con forma de dinosaurio son mas ricos que los normales, no leo lloros
-Sabias que para producir miel en invierno, los apicultores de la Pampa ponen agua con azucar para las abejas?
-Ya desinstale copilot pero a veces se freezea el menu al buscar algo, es eso normal o que?
-y recuerden muchachos! piratear software indie es de gente mala malosa, no seas malo y compralo
-y recuerden muchachos! piratear software de adobe es siempre lo correcto, no les des dinero
-Se que no hay que hacer mucha referencia a anime, por esa razon tambien puse referencias a series para ninos
-Sentado debajo de un mango, debajo de un arbol de mango, sentado me puse a pensar, los arboles tenemos que cuidar
-Google gemini se llamara gemini porque es gemini o simplemente porque el nombre es bonito? para pensar
-Sabes que es lo peor de la IA en VScode? que me trata de autocompletar cosas que no quiero
-La persona que sonríe todo el día. Es la misma que se encierra en el bano a llorar
-Pronto llegará la primavera. La estación en la que te conocí. Una primavera en la que ya no estaras 
-El llorar no limpia los pecados, beberiamos llevarnos esta culpa, como escapo de este laberinto si esperandote estoy?
-Sonara mi voz mas alto que la oscuridad! Borrosa por las lagrimas... Dejare que el eco lleve mi voz
-Feliz hasta la muerte, sigue así hasta que acabe. El mas alla que soe no esta nada mal, me invadio el amor
-En mi cuerpo, mente y alma esta, como si se fuera a desatar, ojala tuviera alas y abrirlas de par en par
-Purgando la noche, purgando la noche, Es hora de actuar apenas llega la oscuridad, Me opondre, el ciclo rompere
-Frases experto: 
-Si no nos pasan la materia el .exe tiene un virus que hara explotar tu pc! nah mentira, no tiene nada... a no ser...
-Hay una version de linux que se parecia a macOS pero la vi a un gringo usar en insta y no me acuerdo como se llama, Pedro ayuda porfa
-Si tu enemigo mortal muere, ve a su funeral lo mejor vestido que puedas, no puedes dejar que un muerto se vea mejor que tu.
-Los cheetas son los unicos felinos grandes que pueden maullar debido a que estan mas cerca geneticamente de los gatos que los leopardos
-Albion Online es un mmorpg no lineal, en el que escribes tu propia historia sin limitarte a seguir un camino prefijado
-"El hombre no puede obtener nada sin primero dar algo a cambio. Para crear, algo de igual valor debe perderse. Esa es la primera ley de la Alquimia, la ley del intercambio equivalente.
-Estaba pensando una cosa... No opinas que comer ninos a pasado de ser una moda a ser parte de nuestras vidas?
-Lo que siento, Cómo he de llevar dentro? No lo soporto más, es algo tan dulce que me hace vomitar, Todo veo fatal y no puedo respirar, eres la única respuesta de mi realidad
-Solo un nino soy, y yo creciendo voy, exploro todo, soy Caillou, hay mucho que hacer, mucho por conocer, ven te invito, soy Caillou
-Ayuda por favor... se me quedo atascada la cancion de inicio de Caillou en la cabeza... ni siquiera me gustaba Caillou 
-No tiene nada de malo ser un héroe falso. Derrotaré al Rey Demonio y traeré paz al mundo. Entonces no importará si soy falso o no
-Algún día cometerás un error terrible y desearás haber conocido mejor a la gente. Cuando eso ocurra, regresa a este lugar. Entonces yo, Flamme, la hechicera legendaria, te ayudaré.
-Haces que yo, solo tu haces que yo, pueda entender la verdad, con un destello la oscuridad se volvera claridad
-Shigatsu wa kimi no uso me hizo llorar como no se imaginan, un muy buen anime la verdad, creo que esta en espanol en netflix
-Por que sabiendo, cuan larga es la vida, me deprimo con facilidad? Quiero comenzar de nuevo y lo inconcluso de una vez realizar, yo se que hay algo mas
-Deberia dejar de hacer referencia a anime, seguro que nadie lo entiende... Nah, todos los que entran a programacion son unos frikis, obvio que saben de anime
-Mi locura crece, nada me detiene, tuya es la culpa de mi estado actual, sea algo real o artificial, Quiero cada cosa tuya que me de felicidad
-Muchas de las frases aqui en experto son referencias a canciones dobladas al espanol, espero que alguien sepa de que canciones se tratan
-Le pido disculpas a tu viejo, se que esta todo pago pero bueh- pero bueh, osea yo levanto el telefono pero bueh, le digo a la gente, se cancelo todo el casamiento
-Dale Zelda, Dale! Pasame la trifuerza que tengo hambre, traeme una botella de zora grande que me estan esperando las prietas en Gerudo Valley
-Frases Pedro:
-Pedro hizo clase virtual el 4 de septiembre porque salio Silksong
-Tener windows y linux en una laptop afecta el performance?
-Pedro se que estas influenciando mi youtube, no voy a instalar linux, me da miedo.
-Pedro ayuda, puse un mov de memoria a memoria y el debug me dijo que no tengo papa, es verdad pero no deberia decirlo
-En el proceso de hacer este codigo el debug nos ha llamado, descerebrados, nenes sin afecto paterno, fans de bad bunny...
-Pues estoy escribiendo esto mientras como una pizzita en mi cama, que rico
-Mentira, no comi pizza en casa, comi nuggets de pollo porque era mas facil de hacer
-Aqui pondria una referencia a tu equipo favorito, pero no se si te gusta el futbol asi que dire que Vegeta es mejor que Goku
-Tampoco se si hacer referencia a anime, no se que tan friki es el profesor...
-You may have a Brain... But i have a gun!
-Hello there!
-Haré referencias a distintas sagas frikis, en algun momento pegare con una que le guste al profe
-I like the kind of woman that will just actually kill me, eso fue cowboy bepbop
-Unas ganas de vaguear... una pena que tenemos que terminar el proyecto
-Haria un chiste de macOS pero ya es un chiste en si mismo jaja
-Dale profe ponganos un 10 no sea malo, mira que lindo esta el programa 
-Para encontrar finales de SPD anteriores, ir a frubox unsam
-The first time a mans freedom is trodden on, we are all damaged
-Un mago nunca llega tarde, Frodo, ni pronto, llega exactamente cuando se lo propone
-No pense caer peleando en compania de un elfo
-Frases Fabio:
+si tipeas esto eres noob
+racing es mejor que boca
+los chocolates cadbury son muy ricos, deberias comerlo
+el dulce de leche es argentino y no hay discusion
+los gatos son muy lindos y apapuchables
+me llamo Goku! o tambien Kakaroto
+corruption is bad if i am not involved
+la computadora mas potente es llamada el capitan
+the cake is a lie
+los circuitos integrados se crearon en 1965
+esta muy facil esta frase
+los cheetas son bastante amigable con los humanos
+los ocelotes tambien son conocidos como cunaguaros
+mi abuela llama a los gatos con orejas grandes yusos
+los cheetas, quepardos y pumas pueden maullar pero no rugir
+la maquina diferencial de babbage fue una computadora mecanica
+colossus fue una computadora creada para descifrar codigos creados por la maquina enigma
