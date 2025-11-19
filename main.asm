@@ -10,6 +10,8 @@
     textoErrores db "Errores: ",24h
     textoDificultad db "Dificultad: ",24h
 
+    textoErrores2 db "ERROR:",24h
+
     dif_facil db "facil",24h
     dif_medio db "normal",24h
     dif_dificil db "dificil",24h
@@ -18,6 +20,7 @@
     letraUsuario db ?         ; donde guardo la tecla apretada
     posAcierto   db 0         ; cuántos aciertos llevo (para saber dónde poner los *)
     contadorErrores db 0
+
     columna db 0
     fila db 0
 
@@ -188,7 +191,6 @@ perdisteJmp:
     mov posAcierto, 0
     
     call perdiste
-
 completeFrase:
 
 cargoNuevaFrase:

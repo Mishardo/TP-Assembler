@@ -4,7 +4,7 @@
 .data
     datadiv db 100,10,1          
     Ascii db "000",0ah,0dh,24h
-    cartelError db "ERRORES:$"
+    cartelError db "ERRORES:",24h
     imprimiErrores db 0
 .code
 
@@ -21,9 +21,6 @@
     call r2a
 
     mov al, imprimiErrores
-    cmp al, 0
-    je imprimoErroresStr
-    jmp yaImprimiErrores
 
     imprimoErroresStr:
 
@@ -35,7 +32,7 @@
 
     lea bx, cartelError
     imprimo:
-    cmp byte ptr [bx], '$'
+    cmp byte ptr [bx], '$' ; Errores
     je salir
     mov ah, 0Eh
     mov al, [bx]
