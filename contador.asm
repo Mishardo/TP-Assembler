@@ -26,6 +26,17 @@ contador proc
     push di
     push si
 
+
+    cmp dl, 1
+    je seguirNormal
+    cmp dl, 2
+    je inicalizar
+
+inicalizar:
+mov counter, 0
+
+
+seguirNormal:
     mov contadorCPS, bx
 
     ; === Leer reloj BIOS ===

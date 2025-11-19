@@ -20,6 +20,7 @@
     contadorErrores db 0
     columna db 0
     fila db 0
+
     frasesCompletadas db 0 ;cuantas palabras voy completando
 
     buffer  db 6 dup(?)
@@ -28,7 +29,9 @@
     contadorWPM dw 0
     tiempo dw 0
     nivel db 0
+
     limiteTiempo dw 0
+
     limiteErrores db 0
     resultadoTexto db "RESULTADOS",24h
 
@@ -66,6 +69,11 @@ dificilSet:
     mov limiteErrores,1
     jmp seguir
 seguir:
+mov tiempo, 0
+mov frasesCompletadas, 0
+mov dl, 2
+call contador
+
 ;---------------------- IMPRESION DE LA FRASE ---------------------------
     ; poner modo texto o limpiar pantalla si querés
     mov ah, 0
@@ -139,15 +147,21 @@ bucleJuego:
     lea si, contadorWPM
     push di
     lea di, tiempo
+    push dx 
+
+    
+    mov dl, 1
     call contador       ; actualiza contador si corresponde (no bloqueante)
     mov ax, tiempo
+    pop dx
     pop di
     pop si
     pop bx
 
     cmp ax, limiteTiempo
     je perdisteJmp
-    xor ax,ax
+
+    xor ax, ax
     llamoErrores:
     mov al, contadorErrores
     guardoPuntero:
