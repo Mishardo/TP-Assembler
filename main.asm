@@ -31,9 +31,6 @@
     extrn errores:proc
     extrn contador:proc
     extrn frase:proc
-    extrn errores:proc
-    extrn contador:proc
-    extrn frase:proc
     extrn menu:proc
     extrn perdiste:proc
     extrn puntajes:proc
@@ -166,6 +163,7 @@ bucleJuego:
     je completeFrase
     jmp noCompleteFrase
 perdisteJmp:
+    mov posAcierto, 0
     call perdiste
 
 completeFrase:
