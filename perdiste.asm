@@ -12,6 +12,11 @@
 	mov ax,@data
 	mov ds,ax
 	call cls
+
+	mov ax, 0dh
+	mov bx, 0
+	int 10h
+	
 	call reintentarPrint
 	cmp dl,1
 	je volverMenuOpcion
@@ -25,18 +30,18 @@ terminarOpcion:
 volverMenuOpcion:
 	call cls 
 	call main
-
 	ret
 	
-	perdiste endp
+perdiste endp
 
-	proc reintentarPrint
+
+proc reintentarPrint
 siReintSelect:
 	call cls
 	mov ah,02h
 	mov bh,0
 	mov dh,8; fila
-	mov dl,14 ; columna
+	mov dl,8 ; columna
 	int 10h
 
 	mov ah,9
@@ -90,7 +95,7 @@ noReintSelect:
 	mov ah,02h
 	mov bh,0
 	mov dh,8; fila
-	mov dl,14 ; columna
+	mov dl,8 ; columna
 	int 10h
 
 	mov ah,9
@@ -143,8 +148,9 @@ finalSelect:
 finReint:
 	ret
 
-	reintentarPrint endp
-	proc cls
+reintentarPrint endp
+
+proc cls
 	push ax
 
 	mov ah, 0fh
@@ -155,8 +161,9 @@ finReint:
 
 	pop ax
 	ret
-	cls endp
-	proc minusculizar
+cls endp
+
+proc minusculizar
 	cmp al,41h ;A
 	jae casiMayus
 	jmp terminar
@@ -168,5 +175,5 @@ esMayus:
 	add al,20h
 terminar:
 	ret
-	endp minusculizar
+endp minusculizar
 end

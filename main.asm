@@ -7,6 +7,12 @@
     textoTiempo2 db " segundos",24h
     textoCPS db "CPS: ",24h
     textoWPM db "WPM: ",24h
+    textoErrores db "Errores: ",24h
+    textoDificultad db "Dificultad: ",24h
+
+    dif_facil db "facil",24h
+    dif_medio db "normal",24h
+    dif_dificil db "dificil",24h
 
     fraseInicial db 255 dup(24h)
     letraUsuario db ?         ; donde guardo la tecla apretada
@@ -31,18 +37,15 @@
     extrn errores:proc
     extrn contador:proc
     extrn frase:proc
-    extrn errores:proc
-    extrn contador:proc
-    extrn frase:proc
     extrn menu:proc
     extrn perdiste:proc
-    extrn puntajes:proc
     public main
 main proc
     mov ax,@data
     mov ds,ax
     mov contadorErrores,0
     call menu
+
     mov nivel,dl ; menu me devuelve por dl el nivel
     cmp nivel,1; comparo para saber que nivel me devolvio y en base a eso setear las variables
     je facilSet
@@ -166,6 +169,7 @@ bucleJuego:
     je completeFrase
     jmp noCompleteFrase
 perdisteJmp:
+    mov posAcierto, 0
     call perdiste
 
 completeFrase:
@@ -176,7 +180,7 @@ cargoNuevaFrase:
     call imprimirFrase      ; obtiene nueva frase y la copia a fraseInicial
     lea si, fraseInicial    ; SI apunta al inicio de la nueva frase
     mov posAcierto, 0
-    cmp frasesCompletadas, 5
+    cmp frasesCompletadas, 2
     je finPrograma
     jmp continuarJuego
 
@@ -191,12 +195,12 @@ noCompleteFrase:
     mov ah, 00h
     int 16h             ; AX = key (AH = scancode, AL = ascii)
 
-    comparoConLaLetraActual:
+comparoConLaLetraActual:
     cmp al, [si] 
     jne error ;si no le pegue a la tecla sumo errores
     jmp acierto
 
-    error:
+error:
     inc contadorErrores
     xor al,al
     mov al,contadorErrores
@@ -204,7 +208,7 @@ noCompleteFrase:
     je perdisteJmp
     jmp bucleJuego
 
-    acierto:
+acierto:
     inc si
     inc contadorCPS
     mov bl, al          ; guardar carácter a imprimir
@@ -298,6 +302,7 @@ limpiarLineaFrase:
     mov dl, 10
     int 10h
 
+    mov dl, nivel
     call frase
     mov si, bx
     lea di, fraseInicial
@@ -340,11 +345,47 @@ imprimirResultados proc
     lea dx, resultadoTexto
     int 21h
 
-    ;impresión texto 'WPM'
+
+    ;impresion 'Dificultad'
     mov ah, 02h
     mov bh, 0
     mov dl, 0 ; columna
     mov dh, 6   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoDificultad
+    int 21h
+
+    cmp nivel, 1
+    je mostrarFacil
+    cmp nivel, 2
+    je mostrarMedio
+    cmp nivel, 3
+    je mostrarDificil
+
+mostrarFacil:
+    mov ah, 9
+    lea dx, dif_facil
+    int 21h
+    jmp seguirImprimiendo
+
+mostrarMedio:
+    mov ah, 9
+    lea dx, dif_medio
+    int 21h
+    jmp seguirImprimiendo
+
+mostrarDificil:
+    mov ah, 9
+    lea dx, dif_dificil
+    int 21h
+seguirImprimiendo:
+    ;impresión texto 'WPM'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 7   ; fila
     int 10h
 
     mov ah, 9
@@ -362,7 +403,7 @@ imprimirResultados proc
     mov ah, 02h
     mov bh, 0
     mov dl, 0 ; columna
-    mov dh, 7   ; fila
+    mov dh, 8   ; fila
     int 10h
 
     mov ah, 9
@@ -380,11 +421,33 @@ imprimirResultados proc
     lea dx, textoTiempo2
     int 21h
 
+    ;impresion 'Errores'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 9   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoErrores
+    int 21h
+
+    xor ax, ax
+    mov al, contadorErrores
+    lea di, buffer
+    call convertirNumero
+
+
+    mov ah, 9
+    lea dx, buffer
+    int 21h
+
+
     ;Colocar colocar cursor debajo del texto así no molesta el 'C:\Tasm:>'
     mov ah, 02h
     mov bh, 0
     mov dl, 0 ; columna
-    mov dh, 8   ; fila
+    mov dh, 10   ; fila
     int 10h
     
     ret
