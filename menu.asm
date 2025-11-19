@@ -37,8 +37,13 @@
 	mov ax,@data
 	mov ds,ax
 tituloPrinc:
-	call cls
-
+	mov ax, 0dh
+	mov bx, 0   ; disable blinking.
+	int 10h
+	int 69h 
+	mov ax, 0dh
+	mov bx, 0   ; disable blinking.
+	int 10h
 
 	mov ah,01h
 	mov ch,0026h
@@ -63,8 +68,7 @@ ayudaPagina:
 	je tituloPrinc
 	jmp ayudaPagina
 selectorDific:
-	call cls
-
+	int 69h 
 	mov ah,01h
 	mov ch,0026h
 	mov cl,0007h
@@ -102,7 +106,7 @@ finalReal:
 	proc tituloTxt
 
 selectorJugar:
-	call cls
+	int 69h 
 
 	call tituloPixeles
 	call textoColor
@@ -165,7 +169,8 @@ JugarSeleccionado:
 	mov dl,1
 	jmp retorno
 AyudaSelect:
-	call cls
+	int 69h 
+
 	call tituloPixeles
 	call textoColor
 
@@ -230,7 +235,7 @@ AyudaSeleccionada:
 selectorJugarJmp:
 	jmp selectorJugar
 SalirSelect:
-	call cls
+	int 69h 
 	call tituloPixeles
 	call textoColor
 
@@ -1045,7 +1050,8 @@ terminoCreditos:
 
 	proc seguroPrint
 siSalirSelect:
-	call cls
+	int 69h 
+
 	call cuadradoSalir
 	call estasSeguroColor
 
@@ -1100,7 +1106,8 @@ siSalirSelect:
 
 	jmp siSalirSelect
 noSalirSelect:
-	call cls
+	int 69h 
+
 	call cuadradoSalir
 	call estasSeguroColor
 	mov ah,02h
@@ -1157,7 +1164,8 @@ siSalirSelectJmp:
 volverMenu:
 	jmp tituloPrinc
 finSaltar:
-	call cls
+	int 69h 
+
 	jmp finalReal
 finalSeguro:
 	ret
