@@ -30,12 +30,12 @@ terminarOpcion:
 volverMenuOpcion:
 	call cls 
 	call main
-
 	ret
 	
-	perdiste endp
+perdiste endp
 
-	proc reintentarPrint
+
+proc reintentarPrint
 siReintSelect:
 	call cls
 	mov ah,02h
@@ -148,8 +148,9 @@ finalSelect:
 finReint:
 	ret
 
-	reintentarPrint endp
-	proc cls
+reintentarPrint endp
+
+proc cls
 	push ax
 
 	mov ah, 0fh
@@ -160,8 +161,9 @@ finReint:
 
 	pop ax
 	ret
-	cls endp
-	proc minusculizar
+cls endp
+
+proc minusculizar
 	cmp al,41h ;A
 	jae casiMayus
 	jmp terminar
@@ -173,5 +175,5 @@ esMayus:
 	add al,20h
 terminar:
 	ret
-	endp minusculizar
+endp minusculizar
 end

@@ -10,6 +10,7 @@
     counter dw 0
     buffer  db 6 dup(?)    ; buffer para el número convertido (max 5 digitos + '$')
     contadorCPS dw 0
+    contadorWPM dw 0
 
     UltimoCPS db 0
     ultimoWPM db 0
@@ -158,12 +159,13 @@ contador proc
     ; Convertir CPS → WPM
     mov bx, 12
     mul bx              ; AX = CPS * 12 = WPM
+    mov contadorWPM, ax
 
     ; Convertir resultado a cadena en "buffer"
     lea di, buffer
     call convertirNumero
 
-    ;-------------- CONTAR LARGO DEL WPM -------------
+    ; CONTAR LARGO DEL WPM
     xor cx, cx          ; CX = largo
     lea si, buffer
 .contarLargoWPM:
@@ -173,7 +175,7 @@ contador proc
     inc si
     jmp .contarLargoWPM
 .finContarLargoWPM:
-    ;-------------- BORRAR CARACTERES SOBRANTES -------------
+    ; BORRAR CARACTERES SOBRANTES
     mov al, ultimoWPM
     sub al, cl
     jle .noBorrarWPM        ; si no bajó, no borrar
@@ -222,7 +224,13 @@ contador proc
 ;---------------------------------
 .salir:
     pop si
+    mov ax, contadorWPM
+    mov [si], ax
+
     pop di
+    mov ax, counter
+    mov [di], ax
+    
     pop dx
     pop cx
     pop bx
