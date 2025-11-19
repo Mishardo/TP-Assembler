@@ -12,6 +12,11 @@
 	mov ax,@data
 	mov ds,ax
 	call cls
+
+	mov ax, 0dh
+	mov bx, 0
+	int 10h
+	
 	call reintentarPrint
 	cmp dl,1
 	je volverMenuOpcion
@@ -36,7 +41,7 @@ siReintSelect:
 	mov ah,02h
 	mov bh,0
 	mov dh,8; fila
-	mov dl,14 ; columna
+	mov dl,8 ; columna
 	int 10h
 
 	mov ah,9
@@ -90,7 +95,7 @@ noReintSelect:
 	mov ah,02h
 	mov bh,0
 	mov dh,8; fila
-	mov dl,14 ; columna
+	mov dl,8 ; columna
 	int 10h
 
 	mov ah,9
