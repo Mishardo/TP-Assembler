@@ -20,7 +20,6 @@
     contadorErrores db 0
     columna db 0
     fila db 0
-
     frasesCompletadas db 0 ;cuantas palabras voy completando
 
     buffer  db 6 dup(?)
@@ -29,7 +28,7 @@
     contadorWPM dw 0
     tiempo dw 0
     nivel db 0
-    limiteTiempo db 0
+    limiteTiempo dw 0
     limiteErrores db 0
     resultadoTexto db "RESULTADOS",24h
 
@@ -141,11 +140,14 @@ bucleJuego:
     push di
     lea di, tiempo
     call contador       ; actualiza contador si corresponde (no bloqueante)
+    mov ax, tiempo
     pop di
     pop si
     pop bx
 
-    
+    cmp ax, limiteTiempo
+    je perdisteJmp
+    xor ax,ax
     llamoErrores:
     mov al, contadorErrores
     guardoPuntero:
@@ -170,6 +172,7 @@ bucleJuego:
     jmp noCompleteFrase
 perdisteJmp:
     mov posAcierto, 0
+    
     call perdiste
 
 completeFrase:
@@ -180,7 +183,7 @@ cargoNuevaFrase:
     call imprimirFrase      ; obtiene nueva frase y la copia a fraseInicial
     lea si, fraseInicial    ; SI apunta al inicio de la nueva frase
     mov posAcierto, 0
-    cmp frasesCompletadas, 2
+    cmp frasesCompletadas, 3
     je finPrograma
     jmp continuarJuego
 
