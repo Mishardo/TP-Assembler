@@ -11,7 +11,7 @@
     textoDificultad db "Dificultad: ",24h
 
     dif_facil db "facil",24h
-    dif_medio db "medio",24h
+    dif_medio db "normal",24h
     dif_dificil db "dificil",24h
 
     fraseInicial db 255 dup(24h)
@@ -302,6 +302,7 @@ limpiarLineaFrase:
     mov dl, 10
     int 10h
 
+    mov dl, nivel
     call frase
     mov si, bx
     lea di, fraseInicial
