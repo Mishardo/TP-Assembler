@@ -3,9 +3,10 @@
 .model small
 .stack 100h
 .data
-    textoTiempo db "Tiempo: ",0
-    textoCPS db "CPS: ",0
-    textoWPM db "WPM: ",0
+    textoTiempo db "Tiempo: ",24h
+    textoTiempo2 db " segundos",24h
+    textoCPS db "CPS: ",24h
+    textoWPM db "WPM: ",24h
 
     fraseInicial db 255 dup(24h)
     letraUsuario db ?         ; donde guardo la tecla apretada
@@ -13,13 +14,23 @@
     contadorErrores db 0
     columna db 0
     fila db 0
-    
+
+    frasesCompletadas db 0 ;cuantas palabras voy completando
+
+    buffer  db 6 dup(?)
+
     contadorCPS dw 0
+    contadorWPM dw 0
+    tiempo dw 0
     nivel db 0
     limiteTiempo db 0
     limiteErrores db 0
+    resultadoTexto db "RESULTADOS",24h
 
 .code
+    extrn errores:proc
+    extrn contador:proc
+    extrn frase:proc
     extrn errores:proc
     extrn contador:proc
     extrn frase:proc
@@ -52,8 +63,7 @@ dificilSet:
     mov limiteTiempo,15
     mov limiteErrores,1
     jmp seguir
-seguir: ; Seguir es una funcion auxiliar para indicar que termino de setear
-
+seguir:
 ;---------------------- IMPRESION DE LA FRASE ---------------------------
     ; poner modo texto o limpiar pantalla si querés
     mov ah, 0
@@ -72,17 +82,12 @@ seguir: ; Seguir es una funcion auxiliar para indicar que termino de setear
     lea si, textoTiempo
 imprimirTiempo:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirTiempo
-    cmp al,limiteTiempo
-    je terminoRonda
     int 10h
     inc si
     jmp imprimirTiempo
-terminoRonda:
-    mov dl,contadorErrores
-    mov dh,contadorCPS
-    call puntajes
+
 finImprimirTiempo:
 
     mov ah, 02h 
@@ -96,7 +101,7 @@ finImprimirTiempo:
 
 imprimirCPS:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirCPS
     int 10h
     inc si
@@ -115,7 +120,7 @@ finImprimirCPS:
 
 imprimirWPM:
     mov al, [si]
-    cmp al, 0
+    cmp al, 24h
     je finImprimirWPM
     int 10h
     inc si
@@ -125,28 +130,57 @@ finImprimirWPM:
 lea si, fraseInicial
 ;---------------------- CONTADOR DE ERRORES Y DE ACIERTOS------------------------------
 bucleJuego:
+
     push bx
     mov bx, contadorCPS
+    push si
+    lea si, contadorWPM
+    push di
+    lea di, tiempo
     call contador       ; actualiza contador si corresponde (no bloqueante)
+    pop di
+    pop si
     pop bx
+
     
     llamoErrores:
     mov al, contadorErrores
-
     guardoPuntero:
     mov [fila],dh       ;guardo la columna y la fila, porque errores la modifica. asi la restauro luego
     mov [columna], dl
     call errores
 
-    jmp restauroPuntero
-perdisteJmp:
-    call perdiste
     restauroPuntero:
     mov dh, [fila]
     mov dl, [columna]
     mov ah, 02h
     mov bh, 0
     int 10h
+
+
+    ; Chequear si se completó la frase
+    mov al, [si]
+    cmp al, 24h        ; carácter '$'
+    je completeFrase
+    cmp al, 0          ; carácter nulo
+    je completeFrase
+    jmp noCompleteFrase
+perdisteJmp:
+    call perdiste
+
+completeFrase:
+
+cargoNuevaFrase:
+    inc frasesCompletadas
+    call limpiarV           ; limpia fraseInicial local
+    call imprimirFrase      ; obtiene nueva frase y la copia a fraseInicial
+    lea si, fraseInicial    ; SI apunta al inicio de la nueva frase
+    mov posAcierto, 0
+    cmp frasesCompletadas, 5
+    je finPrograma
+    jmp continuarJuego
+
+noCompleteFrase:
 
     ; Chequear teclado (sin bloquear): INT16 AH=01
     mov ah, 01h
@@ -195,12 +229,18 @@ perdisteJmp:
 ;;----------------------------------------------------------
 
 ;---------------------- FIN DEL JUEGO ----------------------
-    cmp byte ptr[si], "$"
-    je finPrograma
 
+continuarJuego:
     jmp bucleJuego
 
 finPrograma:
+    ;Mostrar resutados finales.
+    mov ah, 0
+    mov al, 03h
+    int 10h
+
+    call imprimirResultados
+    
     mov ax,4C00h
     int 21h
 main endp
@@ -208,41 +248,198 @@ main endp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; FUNCIONES INTERNAS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 imprimirFrase proc
-
     push bp
     mov bp, sp
     push bx
     push ax
     push dx
+    push si
+    push di
+    push cx
+
+    ; LIMPIAR la línea de la frase original (blanco)
+    mov ah, 02h         ; posicionar cursor
+    mov bh, 0
+    mov dh, 11          ; fila de la frase
+    mov dl, 10          ; columna inicial
+    int 10h
+    
+    mov cx, 100         ;número de espacios a limpiar
+    mov ah, 0Ah         ;escribir carácter
+    mov al, ' '         ; espacio
+    mov bh, 0
+limpiarLineaFrase:
+    int 10h
+    inc dl
+    mov ah, 02h
+    int 10h
+    mov ah, 0Ah
+    loop limpiarLineaFrase
+
+    ; LIMPIAR la línea de aciertos (caracteres en color)
+    mov ah, 02h         ; posicionar cursor
+    mov bh, 0
+    mov dh, 11          ; misma fila
+    mov dl, 10          ; misma columna inicial
+    int 10h
+    
+    mov cx, 100          ; número de espacios a limpiar
+    mov ah, 09h         ; usar función de escribir con atributo
+    mov al, ' '         ; espacio
+    mov bh, 0
+    mov bl, 07h         ; color blanco normal
+    mov cx, 100          ; limpiar 50 caracteres de una vez
+    int 10h
+
+    ; AHORA imprimir la nueva frase
+    mov ah, 02h         ; reposicionar cursor al inicio
+    mov bh, 0
+    mov dh, 11
+    mov dl, 10
+    int 10h
 
     call frase
     mov si, bx
+    lea di, fraseInicial
 
-        mov dh, 11; FILA (0 25)
-        mov dl, 10 ; COLUMNA (0 80)
-        mov bh, 0
-        mov ah, 2
-        int 10h 
-
-    lea bx, fraseInicial
-bucleImprimirFrase:             ;copia la frase tmb en la variable local para comparar luego en el juego
-        cmp byte ptr [si], 24h
-        je termineDeImprimir
-        mov ah, 0eh
-        mov al, [si]
-        mov byte ptr[bx], al
-        int 10h
-        inc si
-        inc bx
-        jmp bucleImprimirFrase
+bucleImprimirFrase:
+    cmp byte ptr [si], 24h
+    je termineDeImprimir
+    mov ah, 0eh
+    mov al, [si]
+    mov byte ptr [di], al
+    int 10h
+    inc si
+    inc di
+    jmp bucleImprimirFrase
 
 termineDeImprimir:
+    mov byte ptr [di], 24h
+    
+    pop cx
+    pop di
+    pop si
     pop dx
     pop ax
     pop bx
     pop bp
-
     ret 
 imprimirFrase endp
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;80x25
+imprimirResultados proc
+    ;Impresion texto 'Resultado'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 10 ; columna
+    mov dh, 4   ; fila
+    int 10h 
+
+    mov ah, 9
+    lea dx, resultadoTexto
+    int 21h
+
+    ;impresión texto 'WPM'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 6   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoWPM
+    int 21h
+
+    mov ax, contadorWPM
+    lea di, buffer
+    call convertirNumero
+
+    mov ah, 9
+    lea dx, buffer
+    int 21h
+    ;impresión 'Tiempo'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 7   ; fila
+    int 10h
+
+    mov ah, 9
+    lea dx, textoTiempo
+    int 21h
+
+    mov ax, tiempo
+    lea di, buffer
+    call convertirNumero
+
+    mov ah, 9
+    lea dx, buffer
+    int 21h
+
+    lea dx, textoTiempo2
+    int 21h
+
+    ;Colocar colocar cursor debajo del texto así no molesta el 'C:\Tasm:>'
+    mov ah, 02h
+    mov bh, 0
+    mov dl, 0 ; columna
+    mov dh, 8   ; fila
+    int 10h
+    
+    ret
+imprimirResultados endp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+convertirNumero proc
+    push ax
+    push bx
+    push cx
+    push dx
+    mov bx, 10
+    xor cx, cx
+
+.convLoop:
+    xor dx, dx
+    div bx           ; AX / 10 ; remainder in DX
+    push dx
+    inc cx
+    cmp ax, 0
+    jne .convLoop
+
+.writeLoop:
+    pop dx
+    add dl,'0'
+    mov [di],dl
+    inc di
+    dec cx
+    jnz .writeLoop
+    mov byte ptr [di],'$'
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+convertirNumero endp
+
+limpiarV proc
+    push bp
+    push dx
+    mov bp, sp
+
+    mov cx, 255
+    lea di, fraseInicial  
+    limpiar_loop:
+        mov byte ptr [di], 24h
+        inc di
+        loop limpiar_loop
+
+    pop dx
+    pop bp
+    ret
+
+limpiarV endp
+
+
+
 end
